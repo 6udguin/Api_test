@@ -1,3 +1,4 @@
+
 package com.basic.searchBusanYD.vo;
 
 import java.util.List;

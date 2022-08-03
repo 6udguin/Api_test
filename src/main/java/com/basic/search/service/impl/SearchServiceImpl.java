@@ -73,6 +73,10 @@ public class SearchServiceImpl implements SearchService {
 
 		System.out.println(apiURL);
 
+		// hash
+
+		//
+
 		Map<String, String> requestHeaders = new HashMap<String, String>();
 		requestHeaders.put("X-Naver-Client-Id", clientId);
 		requestHeaders.put("X-Naver-Client-Secret", clientSecret);
@@ -132,7 +136,7 @@ public class SearchServiceImpl implements SearchService {
 			apiURL = "https://openapi.naver.com/v1/search/book_adv?d_isbn=" + query;
 		}
 
-		// 보여줄 개수
+		// 보여줄 개수 
 		apiURL += "&display=" + display;
 
 		// 정렬 옵션
@@ -420,7 +424,6 @@ public class SearchServiceImpl implements SearchService {
 
 		apiURL += "&display=" + display;
 
-
 		System.out.println(apiURL);
 
 		Map<String, String> requestHeaders = new HashMap<String, String>();
@@ -445,9 +448,9 @@ public class SearchServiceImpl implements SearchService {
 		}
 
 		return vo;
-	
+
 	}
-	
+
 	// 지역 검색
 	@Override
 	public SearchLocalVo searchLocal(String keyword, String display, String sort) {
@@ -459,15 +462,14 @@ public class SearchServiceImpl implements SearchService {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
- 
+
 		String apiURL = null;
 
 		apiURL = "https://openapi.naver.com/v1/search/local?query=" + query;
-		
-		apiURL += "&sort=" + sort; 
-		
-		apiURL += "&display=" + display;
 
+		apiURL += "&sort=" + sort;
+
+		apiURL += "&display=" + display;
 
 		System.out.println(apiURL);
 
@@ -494,7 +496,7 @@ public class SearchServiceImpl implements SearchService {
 
 		return vo;
 	}
-	
+
 	// 웹문서 검색
 	@Override
 	public SearchWebkrVo searchWebkr(String keyword, String display) {
@@ -506,13 +508,12 @@ public class SearchServiceImpl implements SearchService {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
- 
+
 		String apiURL = null;
 
 		apiURL = "https://openapi.naver.com/v1/search/webkr?query=" + query;
-		
-		apiURL += "&display=" + display;
 
+		apiURL += "&display=" + display;
 
 		System.out.println(apiURL);
 
@@ -539,15 +540,14 @@ public class SearchServiceImpl implements SearchService {
 
 		return vo;
 	}
-	
-	/* 공공데이터포털 API */
-	// 부산 영도구 관광 정보 API
+ 
+	// 부산 영도구 관광정보 
 	@Override
-	public SearchBusanYDVo SearchBusanYD(String numOfRows, String title) {
+	public String SearchBusanYD(String numOfRows) throws IOException {
 		String query = null;
-
+		
 		try {
-			query = URLEncoder.encode(title, "UTF-8");
+			query = URLEncoder.encode(numOfRows, "UTF-8");
 		} catch (UnsupportedEncodingException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -555,46 +555,101 @@ public class SearchServiceImpl implements SearchService {
 		
 		String serviceKey = "VVYz4W%2BGHKMfPgAWB%2FNEJ0pWPvbjfbjo2k92wTKBbcYMKQQN566vxUAr3QmK7XErBUhhsfp%2BJKu2O3AYiGjECg%3D%3D";
 		String dataUrl = "http://openapi.yeongdo.go.kr:8081/openapi-data/service/rest/tour/list";
+
+		String pageNo = "1";
+		String addr = ""; 
+		String title = "";
 		
 		String apiURL = null;
-
-		http://openapi.yeongdo.go.kr:8081/openapi-data/service/rest/tour/list?serviceKey=TwQ7vsIsiayEmrJRVUcEJlqQQ41ibd51Yog341h8MbA1kFOiF3L4h4rvnYgF3xH%2B%2FpvhTx9oGhrw8KxpzyCkGA%3D%3D&numOfRows=20&pageNo=1
 		
-		apiURL = dataUrl;
+		StringBuilder sb = new StringBuilder(dataUrl); /* URL */
+		sb.append("?" + URLEncoder.encode("serviceKey", "UTF-8") + serviceKey); /* Service Key */
+		sb.append("&" + URLEncoder.encode("numOfRows", "UTF-8") + "=" + URLEncoder.encode(numOfRows, "UTF-8")); /* 한 페이지당 항목 수 */
+		sb.append("&" + URLEncoder.encode("pageNo", "UTF-8") + "=" + URLEncoder.encode(pageNo, "UTF-8")); /* 페이지번호 */
+		sb.append("&" + URLEncoder.encode("addr", "UTF-8") + "=" + URLEncoder.encode(addr, "UTF-8")); /* 주소 */
+		sb.append("&" + URLEncoder.encode("title", "UTF-8") + "=" + URLEncoder.encode(title, "UTF-8")); /* 관광지명 */
+
+		URL url = new URL(sb.toString());
 		
-		apiURL += "?serviceKey=" + serviceKey;
 		
-		apiURL += "&numOfRows=" + numOfRows;
-
-
-		System.out.println(apiURL);
-
+		HttpURLConnection conn = (HttpURLConnection)url.openConnection();
+		conn.setRequestMethod("GET");
+		conn.setRequestProperty("Content-type", "application/xml");
+		System.out.println("response code:" + conn.getResponseCode()); //200, 404, 500
+		
+		// 도착한 데이터 처리 
+		BufferedReader br;
+		if( 200 <= conn.getResponseCode() && conn.getResponseCode() < 300) {
+			br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+		}else {
+			br = new BufferedReader(new InputStreamReader(conn.getErrorStream()));
+		}
+		
+		//data -> 문자열로 변환
+		StringBuilder sbxml = new StringBuilder();
+		String line;
+		while((line = br.readLine()) != null) {
+			sbxml.append( line );
+		}
+		br.close();
+		conn.disconnect();
+		
+		String xml = sbxml.toString();
+		System.out.println("SearchServiceImpl xml = " + xml);
+		
+		//Response
+		
+		
+		/*
+		apiURL = "http://openapi.yeongdo.go.kr:8081/openapi-data/service/rest/tour/list?pageNo=" + pageNo;
+		apiURL += "&addr=" + addr;
+		apiURL += "&title=" + title;
+		apiURL += "";
+		*/
+		
+		
+		
+		
+		/*
 		Map<String, String> requestHeaders = new HashMap<String, String>();
-		requestHeaders.put("X-Naver-Client-Id", clientId);
-		requestHeaders.put("X-Naver-Client-Secret", clientSecret);
-		requestHeaders.put("Content-Type", "application/json");
-
+		requestHeaders.put("serviceKey", serviceKey);
+		requestHeaders.put("Content-Type", "application/json;charset=UTF-8");
+		
 		// json response
 		String responseBody = get(apiURL, requestHeaders);
-
+		
+		System.out.println("SearchServiceImpl responseBody" + responseBody);
+		// -> responseBody에 HTML로 값이 들어옴. 
+		
+		
 		// json -> object
 		ObjectMapper om = new ObjectMapper();
 		SearchBusanYDVo vo = null;
+		System.out.println("SearchService Om = " + om);
+		//System.out.println("error test1");
+		
 		try {
 			vo = om.readValue(responseBody, SearchBusanYDVo.class);
+			System.out.println("SearchServiceImpl try in vo = " + vo);
+			System.out.println("error test1");
 		} catch (JsonMappingException e) {
-			// TODO Auto-generated catch block
+			System.out.println("error test2");
 			e.printStackTrace();
-		} catch (JsonProcessingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		} catch (JsonProcessingException e) { // JsonProcessingException e 여기서 에러 발생, 여기서 발생해 try x -> vo = null . 
+			System.out.println("error test3");
+			System.out.println("Catch error JsonProcessingException e= " + e);
+			//e.printStackTrace();
 		}
-
-		return vo;
+		
+		System.out.println("SearchServiceImpl BusanYDVo vo= " + vo); // null return
+		*/
+		return xml;
+		
 	}
 
 	// -----------------------------------------------------------------------------------------
 	private static String get(String apiUrl, Map<String, String> requestHeaders) {
+		System.out.println("SearchServiceImpl get, apiUrl=" + apiUrl + ", requestHeaders=" + requestHeaders);
 		HttpURLConnection con = connect(apiUrl);
 		try {
 			con.setRequestMethod("GET");
@@ -615,10 +670,47 @@ public class SearchServiceImpl implements SearchService {
 		}
 	}
 
-	private static HttpURLConnection connect(String apiUrl) {
+	// StringBuilder
+	private static String get(StringBuilder apiUrl, Map<String, String> requestHeaders) {
+		System.out.println("SearchServiceImpl get, apiUrl=" + apiUrl + ", requestHeaders=" + requestHeaders);
+		HttpURLConnection con = connect(apiUrl);
+		try {
+			con.setRequestMethod("GET");
+			for (Map.Entry<String, String> header : requestHeaders.entrySet()) {
+				con.setRequestProperty(header.getKey(), header.getValue());
+			}
 
+			int responseCode = con.getResponseCode();
+			if (responseCode == HttpURLConnection.HTTP_OK) { // 정상 호출
+				return readBody(con.getInputStream());
+			} else { // 에러 발생
+				return readBody(con.getErrorStream());
+			}
+		} catch (IOException e) {
+			throw new RuntimeException("API 요청과 응답 실패", e);
+		} finally {
+			con.disconnect();
+		}
+	}
+
+	// null 에러 = 부산영도구YD만 HttpURLConnection에서 apiUrl이 null
+	private static HttpURLConnection connect(String apiUrl) {
+		System.out.println("HttpURLConeection apiUrl=" + apiUrl);
 		try {
 			URL url = new URL(apiUrl);
+			return (HttpURLConnection) url.openConnection();
+		} catch (MalformedURLException e) {
+			throw new RuntimeException("API URL이 잘못되었습니다. : " + apiUrl, e);
+		} catch (IOException e) {
+			throw new RuntimeException("연결이 실패했습니다. : " + apiUrl, e);
+		}
+	}
+
+	//
+	private static HttpURLConnection connect(StringBuilder apiUrl) {
+		System.out.println("HttpURLConeection apiUrl=" + apiUrl);
+		try {
+			URL url = new URL(apiUrl + "");
 			return (HttpURLConnection) url.openConnection();
 		} catch (MalformedURLException e) {
 			throw new RuntimeException("API URL이 잘못되었습니다. : " + apiUrl, e);
@@ -643,10 +735,5 @@ public class SearchServiceImpl implements SearchService {
 			throw new RuntimeException("API 응답을 읽는데 실패했습니다.", e);
 		}
 	}
-
-	
-
-	
-	
 
 }

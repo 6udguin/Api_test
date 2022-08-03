@@ -81,4 +81,10 @@ public class HomeController {
 	public String busanYD() {
 		return "service/busanYD";
 	}
+	
+	// 부산 영도구 관광정보 API 테스트
+	@RequestMapping("/BusanYDTest")
+	public String busanYDTest() {
+		return "result/TestBusanYD";
+	}
 }

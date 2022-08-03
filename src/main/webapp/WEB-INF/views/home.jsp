@@ -7,6 +7,20 @@
 <link rel="shortcut icon" type="image/x-icon" href="/img/favicon.ico" />
 <title>Insert title here</title>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script>
+
+	
+	window.onload = function(){
+	let btn = document.getElementById('btn');
+	
+ 	$(btn).click(function(){
+ 		alert('click');
+ 		
+ 	})
+ 	}
+ 	
+ 	
+</script>
 </head>
 <body>
 <h2>Home</h2>
@@ -24,5 +38,7 @@
 <hr>
 <p>공공데이터포털 API</p>
 <a href="/BusanYD">부산 영도구 관광지 검색</a>
+<button type="button" id="btn"  onclick="location.href='/BusanYDTest'">Change location</button>
+
 </body>
 </html>

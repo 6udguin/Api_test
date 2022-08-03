@@ -1,5 +1,7 @@
 package com.basic.search.service;
 
+import java.io.IOException;
+
 import com.basic.search.vo.SearchVo;
 import com.basic.searchBlog.vo.SearchBlogVo;
 import com.basic.searchBook.vo.SearchBookVo;
@@ -49,5 +51,5 @@ public interface SearchService {
 	/* 공공데이터포털 API */
 	
 	//부산 영도구 관광정보 API */
-	SearchBusanYDVo SearchBusanYD(String numOfRows, String title);
+	String SearchBusanYD(String numOfRows) throws IOException;
 }

@@ -1,5 +1,7 @@
 package com.basic.search.controller;
 
+import java.io.IOException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -107,7 +109,7 @@ public class SearchController {
 	}
 
 	// 지식인 검색
-	@RequestMapping("SearchKin")
+	@RequestMapping("/SearchKin")
 	public ModelAndView kinSearch(String keyword, String display, String sort) {
 
 		System.out
@@ -128,7 +130,7 @@ public class SearchController {
 	}
 
 	// 쇼핑 검색
-	@RequestMapping("SearchShop")
+	@RequestMapping("/SearchShop")
 	public ModelAndView shopSearch(String keyword, String display, String sort) {
 
 		System.out
@@ -148,7 +150,7 @@ public class SearchController {
 	}
 
 	// 블로그 검색
-	@RequestMapping("SearchBlog")
+	@RequestMapping("/SearchBlog")
 	public ModelAndView blogSearch(String keyword, String display, String sort) {
 
 		System.out.println("SearchController blogSearch, keyword=" + keyword + ", display=" + ", display=" + display
@@ -167,7 +169,7 @@ public class SearchController {
 	}
 
 	// 백과사전 검색
-	@RequestMapping("SearchEncyc")
+	@RequestMapping("/SearchEncyc")
 	public ModelAndView encycSearch(String keyword, String display) {
 
 		System.out.println("SearchController encycSearch, keyword=" + keyword + ", display=" + display);
@@ -185,7 +187,7 @@ public class SearchController {
 	}
 
 	// 지역 검색
-	@RequestMapping("SearchLocal")
+	@RequestMapping("/SearchLocal")
 	public ModelAndView localSearch(String keyword, String sort, String display) {
 
 		System.out.println(
@@ -205,7 +207,7 @@ public class SearchController {
 	}
 
 	// 웹 문서 검색
-	@RequestMapping("SearchWebkr")
+	@RequestMapping("/SearchWebkr")
 	public ModelAndView webkrSearch(String keyword, String display) {
 
 		System.out.println("SearchController webkrSearch, keyword=" + keyword + ", display=" + display);
@@ -214,7 +216,7 @@ public class SearchController {
 
 		ModelAndView mv = new ModelAndView();
 
-		System.out.println("결과:" + webkrVo.getItems());
+		System.out.println("결과:" + webkrVo.getItems()); 
 
 		mv.addObject("webkrList", webkrVo.getItems());
 		mv.setViewName("result/webkrs");
@@ -225,19 +227,22 @@ public class SearchController {
 	/* 공공데이터포털 API */
 
 	// 부산 영도구 관광정보 API
-	@RequestMapping("SearchBusanYD")
-	public ModelAndView busanYDSearch(String numOfRows, String title) {
+	@RequestMapping("/SearchBusanYD")
+	public ModelAndView busanYDSearch(String numOfRows) throws IOException {
+		 
+		System.out.println("SearchController numOfRows=" + numOfRows );
+		String busanYDVo = searchService.SearchBusanYD(numOfRows);
+		
+		ModelAndView mv = new ModelAndView(); 
+		
+		System.out.println("결과:" + busanYDVo); // null, ServiceImpl()에서 에러 발생
 
-		SearchBusanYDVo busanYDVo = searchService.SearchBusanYD(numOfRows, title);
-
-		ModelAndView mv = new ModelAndView();
-
-		System.out.println("결과:" + busanYDVo);
-
-		mv.addObject("busanYDList", busanYDVo.getItem());
+		mv.addObject("busanYDList", busanYDVo);
 		mv.setViewName("result/busanYDs");
 		
 		return mv;
 	}
+	
+	
 
 }
